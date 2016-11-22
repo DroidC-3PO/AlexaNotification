@@ -1,0 +1,13 @@
+{
+  "intents": [
+    {
+      "intent": "NotificationIntent",
+      "slots": [
+        {
+          "name": "notification",
+          "type": "AMAZON.LITERAL"
+        }
+      ]
+    }
+  ]
+}
