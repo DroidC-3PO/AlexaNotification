@@ -4,9 +4,9 @@
       "intent": "NotificationIntent",
       "slots": [
         {
-          "name": "notification",
+          "name": "text",
           "type": "AMAZON.LITERAL"
-        }
+       } 
       ]
     }
   ]

@@ -1,1 +1,2 @@
-NotificationIntent say {Notification}
+NotificationIntent notification {How is your day|text}
+

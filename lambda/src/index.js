@@ -1,49 +1,81 @@
-require('dotenv').load();
+/**
+    Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
-var http       = require('http')
-  , AlexaSkill = require('./AlexaSkill')
-  , APP_ID     = process.env.APP_ID
-  , MTA_KEY    = process.env.MTA_KEY;
+    Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
 
+        http://aws.amazon.com/apache2.0/
 
-var Notification = function(){
-  AlexaSkill.call(this, APP_ID);
+    or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+*/
+
+/**
+ * This simple sample has no external dependencies or session management, and shows the most basic
+ * example of how to create a Lambda function for handling Alexa Skill requests.
+ *
+ * Examples:
+ * One-shot model:
+ *  User: "Alexa, tell Greeter to say hello"
+ *  Alexa: "Hello World!"
+ */
+
+/**
+ * App ID for the skill
+ */
+var APP_ID = ""; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
+
+/**
+ * The AlexaSkill prototype and helper functions
+ */
+var AlexaSkill = require('./AlexaSkill');
+
+/**
+ * NoteFunction is a child of AlexaSkill.
+ * To read more about inheritance in JavaScript, see the link below.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
+ */
+var NoteFunction = function () {
+    AlexaSkill.call(this, APP_ID);
 };
 
-Notification.prototype = Object.create(AlexaSkill.prototype);
-Notification.prototype.constructor = Notification;
+// Extend AlexaSkill
+NoteFunction.prototype = Object.create(AlexaSkill.prototype);
+NoteFunction.prototype.constructor = NoteFunction;
 
-Notification.prototype.eventHandlers.onSessionStarted = function(sessionStartedRequest, session){
-  // What happens when the session starts? Optional
-  console.log("onSessionStarted requestId: " + sessionStartedRequest.requestId
-      + ", sessionId: " + session.sessionId);
+NoteFunction.prototype.eventHandlers.onSessionStarted = function (sessionStartedRequest, session) {
+    console.log("NoteFunction onSessionStarted requestId: " + sessionStartedRequest.requestId
+        + ", sessionId: " + session.sessionId);
+    // any initialization logic goes here
 };
 
-Notification.prototype.eventHandlers.onLaunch = function(launchRequest, session, response){
-  // This is when they launch the skill but don't specify what they want. Prompt
-  // them for their bus stop
-  var output = 'Welcome to Notifications. ' +
-    'Say the number of a bus stop to get how far the next bus is away.';
-
-  var reprompt = 'Which bus stop do you want to find more about?';
-
-  response.ask(output, reprompt);
-
-  console.log("onLaunch requestId: " + launchRequest.requestId
-      + ", sessionId: " + session.sessionId);
+NoteFunction.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
+    console.log("NoteFunction onLaunch requestId: " + launchRequest.requestId + ", sessionId: " + session.sessionId);
+    var speechOutput = "Welcome to the Alexa Skills Kit, you can say hello";
+    var repromptText = "You can say hello";
+    response.ask(speechOutput, repromptText);
 };
 
-Notification.prototype.intentHandlers = {
-  NotificationIntent: function(intent, session, response){
-	var NotificationMSG = intent.slots.notification.value;
-    response.tell(NotificationMSG);
-  },
+NoteFunction.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
+    console.log("NoteFunction onSessionEnded requestId: " + sessionEndedRequest.requestId
+        + ", sessionId: " + session.sessionId);
+    // any cleanup logic goes here
+};
 
+NoteFunction.prototype.intentHandlers = {
+    // register custom intent handlers
+    NotificationIntent: function (intent, session, response) {
+		var text = intent.slots.text.value;
+		response.tell(text);
+    },
+    HelpIntent: function (intent, session, response) {
+        response.ask("You can say hello to me!", "You can say hello to me!");
+    }
 };
 
 // Create the handler that responds to the Alexa Request.
-exports.handler = function(event, context) {
-    var skill = new Notification();
+exports.handler = function (event, context) {
+    // Create an instance of the NoteFunction skill.
+    var skill  = new NoteFunction();
     skill.execute(event, context);
 };
 
